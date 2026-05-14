@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -148,121 +147,120 @@
   const FL = ['','しっかりチーズ','チーズ寄り','中間','バター寄り','リッチバター'];
   let entries=[], currentId=null, formImage=null, formRating=3;
 
-document.getElementById(‘f-date’).value = new Date().toISOString().split(‘T’)[0];
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
 
-async function loadEntries() {
-try { const r = await fetch(SB_URL+”/rest/v1/entries?order=id.desc”,{headers:H}); entries=await r.json(); if(!Array.isArray(entries))entries=[]; } catch(e){entries=[];}
-renderGallery();
-}
+  async function loadEntries() {
+    try { const r = await fetch(SB_URL+"/rest/v1/entries?order=id.desc",{headers:H}); entries=await r.json(); if(!Array.isArray(entries))entries=[]; } catch(e){entries=[];}
+    renderGallery();
+  }
 
-function renderGallery() {
-document.getElementById(‘count’).textContent = entries.length+’ 本 記録済み 🎉’;
-const el = document.getElementById(‘view-list’);
-if(entries.length===0){el.innerHTML=’<div class="empty"><div style="font-size:60px">🥛</div><p style="font-size:16px;color:#3a9fd4;font-weight:700;margin-top:12px">まだ記録がないよ！</p><small style="font-size:13px;color:#90cde8">旅先で飲んだ牛乳を追加しよう ☁️</small></div>’;return;}
-let h=’<div class="grid">’;
-entries.forEach(e=>{
-const img=e.image?`<img src="${e.image}" alt="">`:’<div class="no-img">🥛</div>’;
-h+=`<div class="card" onclick="showDetail(${e.id})">${img}<div class="card-label"><div class="cn">${e.name}</div><div class="cs">${'⭐'.repeat(e.rating||0)}</div></div></div>`;
-});
-h+=’</div>’; el.innerHTML=h;
-}
+  function renderGallery() {
+    document.getElementById('count').textContent = entries.length+' 本 記録済み 🎉';
+    const el = document.getElementById('view-list');
+    if(entries.length===0){el.innerHTML='<div class="empty"><div style="font-size:60px">🥛</div><p style="font-size:16px;color:#3a9fd4;font-weight:700;margin-top:12px">まだ記録がないよ！</p><small style="font-size:13px;color:#90cde8">旅先で飲んだ牛乳を追加しよう ☁️</small></div>';return;}
+    let h='<div class="grid">';
+    entries.forEach(e=>{
+      const img=e.image?`<img src="${e.image}" alt="">`:'<div class="no-img">🥛</div>';
+      h+=`<div class="card" onclick="showDetail(${e.id})">${img}<div class="card-label"><div class="cn">${e.name}</div><div class="cs">${'⭐'.repeat(e.rating||0)}</div></div></div>`;
+    });
+    h+='</div>'; el.innerHTML=h;
+  }
 
-function showView(v) {
-[‘list’,‘add’,‘detail’].forEach(x=>{
-document.getElementById(‘view-’+x).style.display=x===v?‘block’:‘none’;
-const b=document.getElementById(‘btn-’+x); if(b){b.className=x===v?‘active’:‘inactive’;}
-});
-if(v===‘add’)resetForm();
-}
+  function showView(v) {
+    ['list','add','detail'].forEach(x=>{
+      document.getElementById('view-'+x).style.display=x===v?'block':'none';
+      const b=document.getElementById('btn-'+x); if(b){b.className=x===v?'active':'inactive';}
+    });
+    if(v==='add')resetForm();
+  }
 
-function resetForm() {
-formImage=null; formRating=3;
-[‘f-name’,‘f-brand’,‘f-location’,‘f-notes’].forEach(id=>document.getElementById(id).value=’’);
-document.getElementById(‘f-date’).value=new Date().toISOString().split(‘T’)[0];
-document.getElementById(‘f-type’).value=‘普通牛乳’;
-document.getElementById(‘f-richness’).value=3;
-document.getElementById(‘f-flavor’).value=3;
-document.getElementById(‘photo-upload’).innerHTML=’<div class="photo-placeholder"><div style="font-size:30px">📷</div><small style="font-size:11px;margin-top:6px;font-weight:600;display:block">タップして写真を選ぶ</small></div>’;
-document.getElementById(‘remove-photo’).style.display=‘none’;
-document.getElementById(‘save-btn’).style.background=‘linear-gradient(135deg,#3a9fd4,#5bb8e8)’;
-document.getElementById(‘save-btn’).textContent=‘🥛 記録する！’;
-document.getElementById(‘save-btn’).disabled=false;
-updateRichness(); updateFlavor(‘f-flavor’,‘f-flavor-thumb’,‘f-flavor-lbl’); renderStars();
-}
+  function resetForm() {
+    formImage=null; formRating=3;
+    ['f-name','f-brand','f-location','f-notes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('f-type').value='普通牛乳';
+    document.getElementById('f-richness').value=3;
+    document.getElementById('f-flavor').value=3;
+    document.getElementById('photo-upload').innerHTML='<div class="photo-placeholder"><div style="font-size:30px">📷</div><small style="font-size:11px;margin-top:6px;font-weight:600;display:block">タップして写真を選ぶ</small></div>';
+    document.getElementById('remove-photo').style.display='none';
+    document.getElementById('save-btn').style.background='linear-gradient(135deg,#3a9fd4,#5bb8e8)';
+    document.getElementById('save-btn').textContent='🥛 記録する！';
+    document.getElementById('save-btn').disabled=false;
+    updateRichness(); updateFlavor('f-flavor','f-flavor-thumb','f-flavor-lbl'); renderStars();
+  }
 
-function handlePhoto(input) {
-const file=input.files[0]; if(!file)return;
-const reader=new FileReader();
-reader.onload=ev=>{formImage=ev.target.result;document.getElementById(‘photo-upload’).innerHTML=`<img src="${formImage}">`;document.getElementById(‘remove-photo’).style.display=‘block’;};
-reader.readAsDataURL(file);
-}
+  function handlePhoto(input) {
+    const file=input.files[0]; if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{formImage=ev.target.result;document.getElementById('photo-upload').innerHTML=`<img src="${formImage}">`;document.getElementById('remove-photo').style.display='block';};
+    reader.readAsDataURL(file);
+  }
 
-function removePhoto() {
-formImage=null;
-document.getElementById(‘photo-upload’).innerHTML=’<div class="photo-placeholder"><div style="font-size:30px">📷</div><small style="font-size:11px;margin-top:6px;font-weight:600;display:block">タップして写真を選ぶ</small></div>’;
-document.getElementById(‘remove-photo’).style.display=‘none’;
-document.getElementById(‘file-input’).value=’’;
-}
+  function removePhoto() {
+    formImage=null;
+    document.getElementById('photo-upload').innerHTML='<div class="photo-placeholder"><div style="font-size:30px">📷</div><small style="font-size:11px;margin-top:6px;font-weight:600;display:block">タップして写真を選ぶ</small></div>';
+    document.getElementById('remove-photo').style.display='none';
+    document.getElementById('file-input').value='';
+  }
 
-function setRating(n){formRating=n;renderStars();}
-function renderStars(){
-const el=document.getElementById(‘stars-form’);
-el.innerHTML=[1,2,3,4,5].map(n=>`<span onclick="setRating(${n})" style="filter:${n<=formRating?'none':'grayscale(1) opacity(0.25)'}">⭐</span>`).join(’’);
-}
+  function setRating(n){formRating=n;renderStars();}
+  function renderStars(){
+    const el=document.getElementById('stars-form');
+    el.innerHTML=[1,2,3,4,5].map(n=>`<span onclick="setRating(${n})" style="filter:${n<=formRating?'none':'grayscale(1) opacity(0.25)'}">⭐</span>`).join('');
+  }
 
-function updateRichness(){document.getElementById(‘richness-display’).textContent=‘🥛’.repeat(parseInt(document.getElementById(‘f-richness’).value));}
+  function updateRichness(){document.getElementById('richness-display').textContent='🥛'.repeat(parseInt(document.getElementById('f-richness').value));}
 
-function updateFlavor(inputId,thumbId,lblId){
-const v=parseInt(document.getElementById(inputId).value);
-const pct=((v-1)/4)*88+6;
-const t=document.getElementById(thumbId);
-t.style.left=pct+’%’; t.textContent=v<=2?‘🧀’:v>=4?‘🧈’:‘🥛’;
-document.getElementById(lblId).textContent=FL[v];
-}
+  function updateFlavor(inputId,thumbId,lblId){
+    const v=parseInt(document.getElementById(inputId).value);
+    const pct=((v-1)/4)*88+6;
+    const t=document.getElementById(thumbId);
+    t.style.left=pct+'%'; t.textContent=v<=2?'🧀':v>=4?'🧈':'🥛';
+    document.getElementById(lblId).textContent=FL[v];
+  }
 
-async function handleAdd(){
-const name=document.getElementById(‘f-name’).value.trim();
-const location=document.getElementById(‘f-location’).value.trim();
-if(!name||!location){alert(‘名前と場所は必須です！’);return;}
-const btn=document.getElementById(‘save-btn’);
-btn.textContent=‘保存中…’; btn.disabled=true;
-const data={name,location,brand:document.getElementById(‘f-brand’).value.trim(),date:document.getElementById(‘f-date’).value,type:document.getElementById(‘f-type’).value,rating:formRating,richness:parseInt(document.getElementById(‘f-richness’).value),flavor:parseInt(document.getElementById(‘f-flavor’).value),notes:document.getElementById(‘f-notes’).value.trim(),image:formImage};
-try{
-const r=await fetch(SB_URL+”/rest/v1/entries”,{method:“POST”,headers:{…H,“Prefer”:“return=representation”},body:JSON.stringify(data)});
-const result=await r.json();
-if(Array.isArray(result)&&result[0])entries.unshift(result[0]); else await loadEntries();
-}catch(e){await loadEntries();}
-btn.style.background=‘linear-gradient(135deg,#86efac,#34d399)’; btn.textContent=‘✅ 保存したよ！’;
-document.getElementById(‘count’).textContent=entries.length+’ 本 記録済み 🎉’;
-setTimeout(()=>{showView(‘list’);renderGallery();},1000);
-}
+  async function handleAdd(){
+    const name=document.getElementById('f-name').value.trim();
+    const location=document.getElementById('f-location').value.trim();
+    if(!name||!location){alert('名前と場所は必須です！');return;}
+    const btn=document.getElementById('save-btn');
+    btn.textContent='保存中...'; btn.disabled=true;
+    const data={name,location,brand:document.getElementById('f-brand').value.trim(),date:document.getElementById('f-date').value,type:document.getElementById('f-type').value,rating:formRating,richness:parseInt(document.getElementById('f-richness').value),flavor:parseInt(document.getElementById('f-flavor').value),notes:document.getElementById('f-notes').value.trim(),image:formImage};
+    try{
+      const r=await fetch(SB_URL+"/rest/v1/entries",{method:"POST",headers:{...H,"Prefer":"return=representation"},body:JSON.stringify(data)});
+      const result=await r.json();
+      if(Array.isArray(result)&&result[0])entries.unshift(result[0]); else await loadEntries();
+    }catch(e){await loadEntries();}
+    btn.style.background='linear-gradient(135deg,#86efac,#34d399)'; btn.textContent='✅ 保存したよ！';
+    document.getElementById('count').textContent=entries.length+' 本 記録済み 🎉';
+    setTimeout(()=>{showView('list');renderGallery();},1000);
+  }
 
-function showDetail(id){
-const e=entries.find(x=>x.id===id); if(!e)return;
-currentId=id;
-document.getElementById(‘detail-img’).innerHTML=e.image?`<img src="${e.image}" alt="">`:’<div style="font-size:60px">🥛</div>’;
-document.getElementById(‘detail-name’).textContent=e.name;
-const b=document.getElementById(‘detail-brand’); b.textContent=e.brand||’’; b.style.display=e.brand?‘block’:‘none’;
-document.getElementById(‘detail-stars’).innerHTML=[1,2,3,4,5].map(n=>`<span style="font-size:26px;filter:${n<=(e.rating||0)?'none':'grayscale(1) opacity(0.25)'}">⭐</span>`).join(’’);
-document.getElementById(‘detail-grid’).innerHTML=[[‘📍’,‘場所’,e.location],[‘📅’,‘日付’,e.date],[‘🏷️’,‘種類’,e.type],[‘💧’,‘コク’,‘🥛’.repeat(e.richness||0)]].map(([em,lb,v])=>`<div class="info-item"><div style="font-size:15px;margin-bottom:2px">${em}</div><div style="font-size:10px;color:#90cde8;font-weight:700;margin-bottom:2px">${lb}</div><div style="font-size:12px;color:#2c5f7a;font-weight:700">${v}</div></div>`).join(’’);
-document.getElementById(‘d-flavor’).value=e.flavor||3;
-updateFlavor(‘d-flavor’,‘d-flavor-thumb’,‘d-flavor-lbl’);
-const nb=document.getElementById(‘detail-notes-box’);
-if(e.notes){nb.style.display=‘block’;document.getElementById(‘detail-notes’).textContent=e.notes;}else{nb.style.display=‘none’;}
-document.getElementById(‘delete-btn’).onclick=()=>handleDelete(id);
-showView(‘detail’);
-}
+  function showDetail(id){
+    const e=entries.find(x=>x.id===id); if(!e)return;
+    currentId=id;
+    document.getElementById('detail-img').innerHTML=e.image?`<img src="${e.image}" alt="">`:'<div style="font-size:60px">🥛</div>';
+    document.getElementById('detail-name').textContent=e.name;
+    const b=document.getElementById('detail-brand'); b.textContent=e.brand||''; b.style.display=e.brand?'block':'none';
+    document.getElementById('detail-stars').innerHTML=[1,2,3,4,5].map(n=>`<span style="font-size:26px;filter:${n<=(e.rating||0)?'none':'grayscale(1) opacity(0.25)'}">⭐</span>`).join('');
+    document.getElementById('detail-grid').innerHTML=[['📍','場所',e.location],['📅','日付',e.date],['🏷️','種類',e.type],['💧','コク','🥛'.repeat(e.richness||0)]].map(([em,lb,v])=>`<div class="info-item"><div style="font-size:15px;margin-bottom:2px">${em}</div><div style="font-size:10px;color:#90cde8;font-weight:700;margin-bottom:2px">${lb}</div><div style="font-size:12px;color:#2c5f7a;font-weight:700">${v}</div></div>`).join('');
+    document.getElementById('d-flavor').value=e.flavor||3;
+    updateFlavor('d-flavor','d-flavor-thumb','d-flavor-lbl');
+    const nb=document.getElementById('detail-notes-box');
+    if(e.notes){nb.style.display='block';document.getElementById('detail-notes').textContent=e.notes;}else{nb.style.display='none';}
+    document.getElementById('delete-btn').onclick=()=>handleDelete(id);
+    showView('detail');
+  }
 
-async function handleDelete(id){
-if(!confirm(‘この記録を削除しますか？’))return;
-await fetch(SB_URL+”/rest/v1/entries?id=eq.”+id,{method:“DELETE”,headers:H});
-entries=entries.filter(e=>e.id!==id);
-document.getElementById(‘count’).textContent=entries.length+’ 本 記録済み 🎉’;
-showView(‘list’); renderGallery();
-}
+  async function handleDelete(id){
+    if(!confirm('この記録を削除しますか？'))return;
+    await fetch(SB_URL+"/rest/v1/entries?id=eq."+id,{method:"DELETE",headers:H});
+    entries=entries.filter(e=>e.id!==id);
+    document.getElementById('count').textContent=entries.length+' 本 記録済み 🎉';
+    showView('list'); renderGallery();
+  }
 
-showView(‘list’); renderStars(); updateFlavor(‘f-flavor’,‘f-flavor-thumb’,‘f-flavor-lbl’); loadEntries();
+  showView('list'); renderStars(); updateFlavor('f-flavor','f-flavor-thumb','f-flavor-lbl'); loadEntries();
 </script>
-
 </body>
 </html>
