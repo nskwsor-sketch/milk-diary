@@ -73,6 +73,19 @@
       );
     };
 
+    const inp = { width:"100%", background:"#f0f8ff", border:"2px solid #b3d9f5", borderRadius:12,
+      color:"#2c5f7a", padding:"10px 14px", fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
+
+    const Field = ({label, emoji, children}) => (
+      <div style={{ marginBottom:15 }}>
+        <label style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, fontWeight:800,
+          color:"#4a9cc0", marginBottom:6, letterSpacing:1, textTransform:"uppercase" }}>
+          {emoji && <span style={{fontSize:13}}>{emoji}</span>}{label}
+        </label>
+        {children}
+      </div>
+    );
+
     function App() {
       const [entries, setEntries] = useState([]);
       const [view, setView] = useState("list");
@@ -108,19 +121,6 @@
         saveEntries(entries.filter(e => e.id !== id));
         setView("list"); setSelected(null);
       };
-
-      const inp = { width:"100%", background:"#f0f8ff", border:"2px solid #b3d9f5", borderRadius:12,
-        color:"#2c5f7a", padding:"10px 14px", fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
-
-      const Field = ({label, emoji, children}) => (
-        <div style={{ marginBottom:15 }}>
-          <label style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, fontWeight:800,
-            color:"#4a9cc0", marginBottom:6, letterSpacing:1, textTransform:"uppercase" }}>
-            {emoji && <span style={{fontSize:13}}>{emoji}</span>}{label}
-          </label>
-          {children}
-        </div>
-      );
 
       return (
         <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#e4f2fc 0%,#f0f8ff 50%,#fff 100%)",
