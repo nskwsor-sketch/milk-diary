@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="ja">
@@ -10,366 +9,260 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="牛乳日記" />
   <title>牛乳日記 🥛</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #e4f2fc; }
+    body { background: linear-gradient(160deg, #e4f2fc 0%, #f0f8ff 50%, #fff 100%); font-family: 'Hiragino Maru Gothic Pro', 'Meiryo', sans-serif; color: #2c5f7a; min-height: 100vh; }
     @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-    @keyframes pop { 0%{transform:scale(0.92);opacity:0} 100%{transform:scale(1);opacity:1} }
     @keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
-    .thumb-card:hover { transform: scale(1.04); box-shadow: 0 8px 22px rgba(74,156,192,0.3) !important; }
-    .thumb-card { transition: transform 0.18s, box-shadow 0.18s; }
-    input:focus, select:focus, textarea:focus { border-color: #5bb8e8 !important; box-shadow: 0 0 0 3px rgba(91,184,232,0.18) !important; outline: none; }
+    .header { background: linear-gradient(135deg, #b8dff5, #d8eefb, #eaf6ff); padding: 28px 20px 18px; text-align: center; border-bottom: 3px solid #c4e2f7; position: relative; overflow: hidden; }
+    .header h1 { font-size: 25px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(90deg, #2980b9, #5bb8e8, #2980b9); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 3s linear infinite; margin: 5px 0 2px; }
+    .header p { font-size: 11px; color: #7ab8d8; letter-spacing: 2px; }
+    .milk-icon { font-size: 40px; animation: bounce 2.2s infinite; display: inline-block; }
+    .count { margin-top: 10px; display: inline-block; background: rgba(255,255,255,0.75); padding: 4px 16px; border-radius: 20px; font-size: 12px; color: #3a9fd4; font-weight: 700; }
+    .nav { display: flex; justify-content: center; gap: 10px; padding: 14px 20px 0; }
+    .nav button { padding: 8px 24px; border-radius: 50px; cursor: pointer; font-size: 13px; font-weight: 700; font-family: inherit; transition: all 0.2s; }
+    .active { background: linear-gradient(135deg, #3a9fd4, #5bb8e8) !important; border: 2px solid #3a9fd4 !important; color: #fff !important; box-shadow: 0 4px 14px rgba(58,159,212,0.35) !important; }
+    .inactive { background: #fff !important; border: 2px solid #c4e2f7 !important; color: #3a9fd4 !important; }
+    .content { max-width: 520px; margin: 0 auto; padding: 16px 12px 70px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .card { aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; cursor: pointer; position: relative; background: linear-gradient(135deg, #c4e2f7, #e4f2fc); box-shadow: 0 3px 12px rgba(74,156,192,0.14); border: 2.5px solid #fff; transition: transform 0.18s, box-shadow 0.18s; }
+    .card:hover { transform: scale(1.04); box-shadow: 0 8px 22px rgba(74,156,192,0.3); }
+    .card img { width: 100%; height: 100%; object-fit: cover; }
+    .no-img { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+    .card-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(20,60,100,0.75)); padding: 16px 6px 6px; }
+    .card-label .cn { font-size: 10px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-label .cs { font-size: 9px; color: rgba(255,255,255,0.85); margin-top: 1px; }
+    .empty { text-align: center; padding: 50px 20px; }
+    .form-box { background: #fff; border-radius: 24px; padding: 20px 16px; box-shadow: 0 4px 28px rgba(74,156,192,0.12); border: 2px solid #ddeefb; }
+    .form-box h2 { margin: 0 0 16px; font-size: 16px; font-weight: 900; color: #3a9fd4; text-align: center; }
+    .field { margin-bottom: 15px; }
+    .field label { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: #4a9cc0; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+    .field input, .field select, .field textarea { width: 100%; background: #f0f8ff; border: 2px solid #b3d9f5; border-radius: 12px; color: #2c5f7a; padding: 10px 14px; font-size: 14px; outline: none; font-family: inherit; box-sizing: border-box; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: #5bb8e8; box-shadow: 0 0 0 3px rgba(91,184,232,0.18); }
+    .field textarea { resize: vertical; line-height: 1.7; }
+    .photo-upload { width: 100%; height: 140px; border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #e4f2fc, #ddeefb); border: 2.5px dashed #b3d9f5; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .photo-placeholder { text-align: center; color: #7ab8d8; }
+    .photo-upload img { width: 100%; height: 100%; object-fit: cover; }
+    .stars span { font-size: 26px; cursor: pointer; transition: transform 0.12s; display: inline-block; margin-right: 4px; }
+    .stars span:hover { transform: scale(1.25); }
+    .richness-row { display: flex; align-items: center; gap: 10px; }
+    .richness-row input { flex: 1; accent-color: #3a9fd4; }
+    .richness-display { text-align: center; font-size: 16px; margin-top: 2px; }
+    .flavor-labels { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 700; }
+    .flavor-track { position: relative; height: 32px; border-radius: 16px; }
+    .flavor-bg { position: absolute; top: 50%; left: 0; right: 0; height: 14px; border-radius: 7px; transform: translateY(-50%); background: linear-gradient(90deg, #fde68a, #fbbf24, #f59e0b, #d97706); box-shadow: inset 0 2px 5px rgba(0,0,0,0.12); }
+    .flavor-range { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; z-index: 2; }
+    .flavor-thumb { position: absolute; top: 50%; width: 30px; height: 30px; border-radius: 50%; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; font-size: 15px; pointer-events: none; border: 2.5px solid #fbbf24; transform: translate(-50%, -50%); transition: left 0.1s; }
+    .flavor-lbl { text-align: center; margin-top: 5px; font-size: 12px; color: #78909c; font-weight: 600; }
+    .save-btn { width: 100%; padding: 14px; margin-top: 4px; background: linear-gradient(135deg, #3a9fd4, #5bb8e8); border: none; border-radius: 16px; color: #fff; font-size: 15px; font-weight: 900; cursor: pointer; font-family: inherit; letter-spacing: 1px; box-shadow: 0 4px 16px rgba(58,159,212,0.38); transition: all 0.3s; }
+    .back-btn { background: #fff; border: 2px solid #c4e2f7; color: #3a9fd4; border-radius: 20px; padding: 7px 18px; cursor: pointer; font-size: 12px; font-weight: 700; font-family: inherit; margin-bottom: 14px; }
+    .detail-box { background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(74,156,192,0.15); border: 2px solid #ddeefb; }
+    .detail-img { height: 200px; background: linear-gradient(135deg, #c4e2f7, #e4f2fc); display: flex; align-items: center; justify-content: center; }
+    .detail-img img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-body { padding: 18px 16px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .info-item { background: #f0f8ff; border-radius: 12px; padding: 9px 11px; border: 1.5px solid #ddeefb; }
+    .flavor-section { background: #fffbeb; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; border: 1.5px solid #fde68a; }
+    .notes-section { background: #f0f8ff; border-radius: 12px; padding: 11px 14px; margin-bottom: 12px; border: 1.5px solid #ddeefb; }
+    .delete-btn { width: 100%; padding: 11px; background: #fff5f5; border: 2px dashed #fca5a5; border-radius: 12px; color: #f87171; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .loading { text-align: center; padding: 50px 20px; }
+    .loading .icon { font-size: 40px; animation: bounce 1s infinite; display: inline-block; }
+    .remove-photo { background: none; border: none; color: #90cde8; font-size: 12px; cursor: pointer; font-family: inherit; margin-top: 4px; }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-    const SUPABASE_URL = "https://glvdcqhcxcplvqybqyrk.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsdmRjcWhjeGNwbHZxeWJxeXJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDk5OTAsImV4cCI6MjA5NDMyNTk5MH0.J3d_nAc7DiqrR8hGdozsgUNPkg_6q0alEqNhkDXPbQM";
-    const supabase = (() => {
-      const headers = { "Content-Type": "application/json", "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY };
-      return {
-        async getAll() {
-          const r = await fetch(SUPABASE_URL + "/rest/v1/entries?order=id.desc", { headers });
-          return r.json();
-        },
-        async insert(entry) {
-          const r = await fetch(SUPABASE_URL + "/rest/v1/entries", {
-            method: "POST", headers: { ...headers, "Prefer": "return=representation" },
-            body: JSON.stringify(entry)
-          });
-          return r.json();
-        },
-        async remove(id) {
-          await fetch(SUPABASE_URL + "/rest/v1/entries?id=eq." + id, { method: "DELETE", headers });
-        }
-      };
-    })();
-    const milkTypes = ["普通牛乳","低脂肪牛乳","無脂肪牛乳","成分無調整","特濃","低温殺菌","ノンホモ","有機牛乳","A2ミルク","その他"];
-    const emptyForm = { name:"", brand:"", location:"", date: new Date().toISOString().split("T")[0], type:"普通牛乳", rating:3, richness:3, flavor:3, notes:"", image:null };
-
-```
-const StarRating = ({ value, onChange }) => (
-  <div style={{ display:"flex", gap:5 }}>
-    {[1,2,3,4,5].map(n => (
-      <span key={n} onClick={() => onChange && onChange(n)}
-        style={{ fontSize:26, cursor: onChange?"pointer":"default", display:"inline-block",
-          filter: n<=value ? "none" : "grayscale(1) opacity(0.25)", transition:"transform 0.12s" }}
-        onMouseEnter={e => { if(onChange) e.currentTarget.style.transform="scale(1.25)" }}
-        onMouseLeave={e => { e.currentTarget.style.transform="scale(1)" }}
-      >⭐</span>
-    ))}
-  </div>
-);
-
-const FlavorBar = ({ value, onChange }) => {
-  const pct = ((value-1)/4)*100;
-  const label = value===1?"しっかりチーズ":value===2?"チーズ寄り":value===3?"中間":value===4?"バター寄り":"リッチバター";
-  return (
-    <div>
-      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-        <span style={{ fontSize:13, fontWeight:700, color:"#d97706" }}>🧀 チーズ</span>
-        <span style={{ fontSize:13, fontWeight:700, color:"#b45309" }}>🧈 バター</span>
-      </div>
-      <div style={{ position:"relative", height:32, borderRadius:16 }}>
-        <div style={{ position:"absolute", top:"50%", left:0, right:0, height:14, borderRadius:7,
-          transform:"translateY(-50%)", background:"linear-gradient(90deg,#fde68a,#fbbf24,#f59e0b,#d97706)",
-          boxShadow:"inset 0 2px 5px rgba(0,0,0,0.12)" }} />
-        <input type="range" min={1} max={5} value={value}
-          onChange={e => onChange && onChange(Number(e.target.value))}
-          style={{ position:"absolute", inset:0, width:"100%", height:"100%",
-            opacity:0, cursor: onChange?"pointer":"default", margin:0, zIndex:2 }} />
-        <div style={{ position:"absolute", top:"50%", left:`calc(${pct}%*0.88 + 6%)`,
-          transform:"translate(-50%,-50%)", width:30, height:30, borderRadius:"50%",
-          background:"#fff", boxShadow:"0 2px 10px rgba(0,0,0,0.2)", display:"flex",
-          alignItems:"center", justifyContent:"center", fontSize:15, pointerEvents:"none",
-          transition:"left 0.1s", border:"2.5px solid #fbbf24" }}>
-          {value<=2?"🧀":value>=4?"🧈":"🥛"}
+<div class="header">
+  <div style="position:absolute;top:8px;left:14px;font-size:18px;opacity:0.18">☁️</div>
+  <div style="position:absolute;top:12px;right:18px;font-size:15px;opacity:0.18">❄️</div>
+  <div class="milk-icon">🥛</div>
+  <h1>牛乳日記</h1>
+  <p>✦ Milk Travel Diary ✦</p>
+  <div class="count" id="count">読み込み中...</div>
+</div>
+<div class="nav">
+  <button id="btn-list" onclick="showView('list')">📷 ギャラリー</button>
+  <button id="btn-add" onclick="showView('add')">＋ 追加</button>
+</div>
+<div class="content">
+  <div id="view-list"><div class="loading"><div class="icon">🥛</div><p style="font-size:14px;color:#90cde8;margin-top:12px">読み込み中...</p></div></div>
+  <div id="view-add" style="display:none">
+    <div class="form-box">
+      <h2>🥛 新しい牛乳を記録！</h2>
+      <div class="field">
+        <label>📷 写真</label>
+        <div class="photo-upload" id="photo-upload" onclick="document.getElementById('file-input').click()">
+          <div class="photo-placeholder"><div style="font-size:30px">📷</div><small style="font-size:11px;margin-top:6px;font-weight:600;display:block">タップして写真を選ぶ</small></div>
         </div>
+        <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+        <button class="remove-photo" id="remove-photo" style="display:none" onclick="removePhoto()">× 写真を削除</button>
       </div>
-      <div style={{ textAlign:"center", marginTop:5, fontSize:12, color:"#78909c", fontWeight:600 }}>{label}</div>
+      <div class="field"><label>📝 牛乳の名前 *</label><input type="text" id="f-name" placeholder="例：十勝しぼりたて"></div>
+      <div class="field"><label>🏭 メーカー・ブランド</label><input type="text" id="f-brand" placeholder="例：よつ葉乳業"></div>
+      <div class="field"><label>📍 飲んだ場所 *</label><input type="text" id="f-location" placeholder="例：北海道 帯広市"></div>
+      <div class="field"><label>📅 日付</label><input type="date" id="f-date"></div>
+      <div class="field"><label>🏷️ 種類</label>
+        <select id="f-type"><option>普通牛乳</option><option>低脂肪牛乳</option><option>無脂肪牛乳</option><option>成分無調整</option><option>特濃</option><option>低温殺菌</option><option>ノンホモ</option><option>有機牛乳</option><option>A2ミルク</option><option>その他</option></select>
+      </div>
+      <div class="field"><label>⭐ 総合評価</label><div class="stars" id="stars-form"></div></div>
+      <div class="field"><label>💧 コク・濃さ</label>
+        <div class="richness-row"><span style="font-size:11px;font-weight:700;color:#90cde8">さっぱり</span><input type="range" min="1" max="5" value="3" id="f-richness" oninput="updateRichness()"><span style="font-size:11px;font-weight:700;color:#3a9fd4">こってり</span></div>
+        <div class="richness-display" id="richness-display">🥛🥛🥛</div>
+      </div>
+      <div class="field"><label>🧀 チーズ ↔ バター</label>
+        <div class="flavor-labels"><span style="color:#d97706">🧀 チーズ</span><span style="color:#b45309">🧈 バター</span></div>
+        <div class="flavor-track"><div class="flavor-bg"></div><input type="range" min="1" max="5" value="3" id="f-flavor" class="flavor-range" oninput="updateFlavor('f-flavor','f-flavor-thumb','f-flavor-lbl')"><div class="flavor-thumb" id="f-flavor-thumb" style="left:50%">🥛</div></div>
+        <div class="flavor-lbl" id="f-flavor-lbl">中間</div>
+      </div>
+      <div class="field"><label>💬 メモ・感想</label><textarea id="f-notes" rows="3" placeholder="美味しかった！思い出を書こう ☁️"></textarea></div>
+      <button class="save-btn" id="save-btn" onclick="handleAdd()">🥛 記録する！</button>
     </div>
-  );
-};
-
-const inp = { width:"100%", background:"#f0f8ff", border:"2px solid #b3d9f5", borderRadius:12,
-  color:"#2c5f7a", padding:"10px 14px", fontSize:14, outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
-
-const Field = ({label, emoji, children}) => (
-  <div style={{ marginBottom:15 }}>
-    <label style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, fontWeight:800,
-      color:"#4a9cc0", marginBottom:6, letterSpacing:1, textTransform:"uppercase" }}>
-      {emoji && <span style={{fontSize:13}}>{emoji}</span>}{label}
-    </label>
-    {children}
   </div>
-);
-
-function App() {
-  const [entries, setEntries] = useState([]);
-  const [view, setView] = useState("list");
-  const [form, setForm] = useState(emptyForm);
-  const [selected, setSelected] = useState(null);
-  const [saved, setSaved] = useState(false);
-  const fileRef = useRef();
-
-  const [loading, setLoading] = React.useState(true);
-
-  useEffect(() => {
-    supabase.getAll().then(data => {
-      if (Array.isArray(data)) setEntries(data);
-      setLoading(false);
-    });
-  }, []);
-
-  const saveEntries = (next) => { setEntries(next); };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => setForm(f => ({...f, image: ev.target.result}));
-    reader.readAsDataURL(file);
-  };
-
-  const handleAdd = async () => {
-    if(!form.name || !form.location) return;
-    const {id: _id, ...data} = form;
-    const result = await supabase.insert(data);
-    if (Array.isArray(result) && result[0]) {
-      saveEntries([result[0], ...entries]);
-    }
-    setSaved(true);
-    setTimeout(() => { setSaved(false); setView("list"); setForm(emptyForm); }, 1000);
-  };
-
-  const handleDelete = async (id) => {
-    await supabase.remove(id);
-    saveEntries(entries.filter(e => e.id !== id));
-    setView("list"); setSelected(null);
-  };
-
-  return (
-    <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#e4f2fc 0%,#f0f8ff 50%,#fff 100%)",
-      fontFamily:"'Hiragino Maru Gothic Pro','Meiryo',sans-serif", color:"#2c5f7a" }}>
-
-      {/* Header */}
-      <div style={{ background:"linear-gradient(135deg,#b8dff5 0%,#d8eefb 50%,#eaf6ff 100%)",
-        padding:"28px 20px 18px", textAlign:"center", borderBottom:"3px solid #c4e2f7",
-        position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", top:8, left:14, fontSize:18, opacity:0.18 }}>☁️</div>
-        <div style={{ position:"absolute", top:12, right:18, fontSize:15, opacity:0.18 }}>❄️</div>
-        <div style={{ fontSize:40, animation:"bounce 2.2s infinite", display:"inline-block" }}>🥛</div>
-        <h1 style={{ margin:"5px 0 2px", fontSize:25, fontWeight:900, letterSpacing:3,
-          background:"linear-gradient(90deg,#2980b9,#5bb8e8,#2980b9)", backgroundSize:"200% auto",
-          WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", animation:"shimmer 3s linear infinite" }}>
-          牛乳日記
-        </h1>
-        <p style={{ margin:0, fontSize:11, color:"#7ab8d8", letterSpacing:2 }}>✦ Milk Travel Diary ✦</p>
-        <div style={{ marginTop:10, display:"inline-block", background:"rgba(255,255,255,0.75)",
-          padding:"4px 16px", borderRadius:20, fontSize:12, color:"#3a9fd4", fontWeight:700 }}>
-          {entries.length} 本 記録済み 🎉
+  <div id="view-detail" style="display:none">
+    <button class="back-btn" onclick="showView('list')">← ギャラリーへ戻る</button>
+    <div class="detail-box">
+      <div class="detail-img" id="detail-img"></div>
+      <div class="detail-body">
+        <h2 id="detail-name" style="margin:0 0 3px;font-size:20px;font-weight:900;color:#2c5f7a"></h2>
+        <p id="detail-brand" style="margin:0 0 10px;font-size:12px;color:#7ab8d8;font-weight:600"></p>
+        <div id="detail-stars" class="stars" style="margin-bottom:14px"></div>
+        <div class="info-grid" id="detail-grid"></div>
+        <div class="flavor-section">
+          <div style="font-size:11px;color:#d97706;font-weight:800;margin-bottom:8px">🧀 チーズ ↔ バター 🧈</div>
+          <div class="flavor-labels"><span style="color:#d97706">🧀 チーズ</span><span style="color:#b45309">🧈 バター</span></div>
+          <div class="flavor-track"><div class="flavor-bg"></div><input type="range" min="1" max="5" id="d-flavor" class="flavor-range" disabled><div class="flavor-thumb" id="d-flavor-thumb" style="left:50%">🥛</div></div>
+          <div class="flavor-lbl" id="d-flavor-lbl">中間</div>
         </div>
-      </div>
-
-      {/* Nav */}
-      <div style={{ display:"flex", justifyContent:"center", gap:10, padding:"14px 20px 0" }}>
-        {[{id:"list",label:"📷 ギャラリー"},{id:"add",label:"＋ 追加"}].map(({id,label}) => (
-          <button key={id} onClick={() => { setView(id); if(id==="add") setForm(emptyForm); }} style={{
-            background: view===id ? "linear-gradient(135deg,#3a9fd4,#5bb8e8)" : "#fff",
-            border: "2px solid "+(view===id?"#3a9fd4":"#c4e2f7"),
-            color: view===id?"#fff":"#3a9fd4", padding:"8px 24px", borderRadius:50,
-            cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit",
-            boxShadow: view===id?"0 4px 14px rgba(58,159,212,0.35)":"none", transition:"all 0.2s"
-          }}>{label}</button>
-        ))}
-      </div>
-
-      <div style={{ maxWidth:520, margin:"0 auto", padding:"16px 12px 70px" }}>
-
-        {/* GALLERY */}
-        {view==="list" && (
-          <div style={{ animation:"pop 0.3s ease" }}>
-            {loading ? (
-              <div style={{ textAlign:"center", padding:"50px 20px" }}>
-                <div style={{ fontSize:40, animation:"bounce 1s infinite", display:"inline-block" }}>🥛</div>
-                <p style={{ fontSize:14, color:"#90cde8", marginTop:12 }}>読み込み中...</p>
-              </div>
-            ) : entries.length===0 ? (
-              <div style={{ textAlign:"center", padding:"50px 20px" }}>
-                <div style={{ fontSize:60 }}>🥛</div>
-                <p style={{ fontSize:16, color:"#3a9fd4", fontWeight:700, marginTop:12 }}>まだ記録がないよ！</p>
-                <p style={{ fontSize:13, color:"#90cde8" }}>旅先で飲んだ牛乳を追加しよう ☁️</p>
-              </div>
-            ) : (
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }}>
-                {entries.map(e => (
-                  <div key={e.id} className="thumb-card"
-                    onClick={() => { setSelected(e); setView("detail"); }}
-                    style={{ aspectRatio:"1/1", borderRadius:16, overflow:"hidden", cursor:"pointer",
-                      position:"relative", background:"linear-gradient(135deg,#c4e2f7,#e4f2fc)",
-                      boxShadow:"0 3px 12px rgba(74,156,192,0.14)", border:"2.5px solid #fff" }}>
-                    {e.image
-                      ? <img src={e.image} alt={e.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                      : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                          <span style={{ fontSize:30 }}>🥛</span>
-                        </div>
-                    }
-                    <div style={{ position:"absolute", bottom:0, left:0, right:0,
-                      background:"linear-gradient(transparent,rgba(20,60,100,0.75))", padding:"16px 6px 6px" }}>
-                      <div style={{ fontSize:10, fontWeight:800, color:"#fff",
-                        whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{e.name}</div>
-                      <div style={{ fontSize:9, color:"rgba(255,255,255,0.85)", marginTop:1 }}>{"⭐".repeat(e.rating)}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ADD */}
-        {view==="add" && (
-          <div style={{ animation:"pop 0.3s ease" }}>
-            <div style={{ background:"#fff", borderRadius:24, padding:"20px 16px",
-              boxShadow:"0 4px 28px rgba(74,156,192,0.12)", border:"2px solid #ddeefb" }}>
-              <h2 style={{ margin:"0 0 16px", fontSize:16, fontWeight:900, color:"#3a9fd4", textAlign:"center" }}>
-                🥛 新しい牛乳を記録！
-              </h2>
-              <Field label="写真" emoji="📷">
-                <div onClick={() => fileRef.current.click()} style={{ width:"100%", height:140, borderRadius:16,
-                  overflow:"hidden", background:"linear-gradient(135deg,#e4f2fc,#ddeefb)",
-                  border:"2.5px dashed #b3d9f5", display:"flex", alignItems:"center",
-                  justifyContent:"center", cursor:"pointer" }}>
-                  {form.image
-                    ? <img src={form.image} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                    : <div style={{ textAlign:"center", color:"#7ab8d8" }}>
-                        <div style={{ fontSize:30 }}>📷</div>
-                        <div style={{ fontSize:11, marginTop:6, fontWeight:600 }}>タップして写真を選ぶ</div>
-                      </div>
-                  }
-                </div>
-                <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display:"none" }} />
-                {form.image && (
-                  <button onClick={() => setForm(f => ({...f,image:null}))}
-                    style={{ background:"none", border:"none", color:"#90cde8", fontSize:12, cursor:"pointer", fontFamily:"inherit", marginTop:4 }}>
-                    × 写真を削除
-                  </button>
-                )}
-              </Field>
-              <Field label="牛乳の名前 *" emoji="📝">
-                <input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="例：十勝しぼりたて" style={inp} />
-              </Field>
-              <Field label="メーカー・ブランド" emoji="🏭">
-                <input value={form.brand} onChange={e=>setForm({...form,brand:e.target.value})} placeholder="例：よつ葉乳業" style={inp} />
-              </Field>
-              <Field label="飲んだ場所 *" emoji="📍">
-                <input value={form.location} onChange={e=>setForm({...form,location:e.target.value})} placeholder="例：北海道 帯広市" style={inp} />
-              </Field>
-              <Field label="日付" emoji="📅">
-                <input type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} style={{...inp,colorScheme:"light"}} />
-              </Field>
-              <Field label="種類" emoji="🏷️">
-                <select value={form.type} onChange={e=>setForm({...form,type:e.target.value})} style={{...inp,cursor:"pointer"}}>
-                  {milkTypes.map(t=><option key={t} value={t}>{t}</option>)}
-                </select>
-              </Field>
-              <Field label="総合評価" emoji="⭐">
-                <StarRating value={form.rating} onChange={v=>setForm({...form,rating:v})} />
-              </Field>
-              <Field label="コク・濃さ" emoji="💧">
-                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                  <span style={{ fontSize:11, color:"#90cde8", fontWeight:700 }}>さっぱり</span>
-                  <input type="range" min={1} max={5} value={form.richness}
-                    onChange={e=>setForm({...form,richness:Number(e.target.value)})}
-                    style={{ flex:1, accentColor:"#3a9fd4" }} />
-                  <span style={{ fontSize:11, color:"#3a9fd4", fontWeight:700 }}>こってり</span>
-                </div>
-                <div style={{ textAlign:"center", fontSize:16, marginTop:2 }}>{"🥛".repeat(form.richness)}</div>
-              </Field>
-              <Field label="チーズ ↔ バター" emoji="🧀">
-                <FlavorBar value={form.flavor} onChange={v=>setForm({...form,flavor:v})} />
-              </Field>
-              <Field label="メモ・感想" emoji="💬">
-                <textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}
-                  placeholder="美味しかった！思い出を書こう ☁️" rows={3}
-                  style={{...inp,resize:"vertical",lineHeight:1.7}} />
-              </Field>
-              <button onClick={handleAdd} style={{ width:"100%", padding:"14px", marginTop:4,
-                background: saved?"linear-gradient(135deg,#86efac,#34d399)":"linear-gradient(135deg,#3a9fd4,#5bb8e8)",
-                border:"none", borderRadius:16, color:"#fff", fontSize:15, fontWeight:900,
-                cursor:"pointer", fontFamily:"inherit", letterSpacing:1,
-                boxShadow:"0 4px 16px rgba(58,159,212,0.38)", transition:"all 0.3s" }}>
-                {saved ? "✅ 保存したよ！" : "🥛 記録する！"}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* DETAIL */}
-        {view==="detail" && selected && (
-          <div style={{ animation:"pop 0.3s ease" }}>
-            <button onClick={() => setView("list")} style={{ background:"#fff", border:"2px solid #c4e2f7",
-              color:"#3a9fd4", borderRadius:20, padding:"7px 18px", cursor:"pointer",
-              fontSize:12, fontWeight:700, fontFamily:"inherit", marginBottom:14 }}>
-              ← ギャラリーへ戻る
-            </button>
-            <div style={{ background:"#fff", borderRadius:24, overflow:"hidden",
-              boxShadow:"0 4px 24px rgba(74,156,192,0.15)", border:"2px solid #ddeefb" }}>
-              <div style={{ height:200, background:"linear-gradient(135deg,#c4e2f7,#e4f2fc)",
-                display:"flex", alignItems:"center", justifyContent:"center" }}>
-                {selected.image
-                  ? <img src={selected.image} alt={selected.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                  : <span style={{ fontSize:60 }}>🥛</span>
-                }
-              </div>
-              <div style={{ padding:"18px 16px" }}>
-                <h2 style={{ margin:"0 0 3px", fontSize:20, fontWeight:900, color:"#2c5f7a" }}>{selected.name}</h2>
-                {selected.brand && <p style={{ margin:"0 0 10px", fontSize:12, color:"#7ab8d8", fontWeight:600 }}>{selected.brand}</p>}
-                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:14 }}>
-                  <StarRating value={selected.rating} />
-                </div>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:14 }}>
-                  {[["📍","場所",selected.location],["📅","日付",selected.date],
-                    ["🏷️","種類",selected.type],["💧","コク","🥛".repeat(selected.richness)]
-                  ].map(([emoji,label,val]) => (
-                    <div key={label} style={{ background:"#f0f8ff", borderRadius:12, padding:"9px 11px", border:"1.5px solid #ddeefb" }}>
-                      <div style={{ fontSize:15, marginBottom:2 }}>{emoji}</div>
-                      <div style={{ fontSize:10, color:"#90cde8", fontWeight:700, marginBottom:2 }}>{label}</div>
-                      <div style={{ fontSize:12, color:"#2c5f7a", fontWeight:700 }}>{val}</div>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ background:"#fffbeb", borderRadius:12, padding:"12px 14px", marginBottom:12, border:"1.5px solid #fde68a" }}>
-                  <div style={{ fontSize:11, color:"#d97706", fontWeight:800, marginBottom:8 }}>🧀 チーズ ↔ バター 🧈</div>
-                  <FlavorBar value={selected.flavor ?? 3} onChange={null} />
-                </div>
-                {selected.notes && (
-                  <div style={{ background:"#f0f8ff", borderRadius:12, padding:"11px 14px", marginBottom:12, border:"1.5px solid #ddeefb" }}>
-                    <div style={{ fontSize:11, color:"#3a9fd4", fontWeight:800, marginBottom:4 }}>💬 メモ</div>
-                    <p style={{ margin:0, fontSize:13, color:"#2c5f7a", lineHeight:1.7 }}>{selected.notes}</p>
-                  </div>
-                )}
-                <button onClick={() => handleDelete(selected.id)} style={{ width:"100%", padding:"11px",
-                  background:"#fff5f5", border:"2px dashed #fca5a5", borderRadius:12,
-                  color:"#f87171", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                  🗑️ この記録を削除
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <div class="notes-section" id="detail-notes-box" style="display:none">
+          <div style="font-size:11px;color:#3a9fd4;font-weight:800;margin-bottom:4px">💬 メモ</div>
+          <p id="detail-notes" style="margin:0;font-size:13px;color:#2c5f7a;line-height:1.7"></p>
+        </div>
+        <button class="delete-btn" id="delete-btn">🗑️ この記録を削除</button>
       </div>
     </div>
-  );
+  </div>
+</div>
+<script>
+  const SB_URL = "https://glvdcqhcxcplvqybqyrk.supabase.co";
+  const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsdmRjcWhjeGNwbHZxeWJxeXJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDk5OTAsImV4cCI6MjA5NDMyNTk5MH0.J3d_nAc7DiqrR8hGdozsgUNPkg_6q0alEqNhkDXPbQM";
+  const H = {"Content-Type":"application/json","apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY};
+  const FL = ['','しっかりチーズ','チーズ寄り','中間','バター寄り','リッチバター'];
+  let entries=[], currentId=null, formImage=null, formRating=3;
+
+document.getElementById(‘f-date’).value = new Date().toISOString().split(‘T’)[0];
+
+async function loadEntries() {
+try { const r = await fetch(SB_URL+”/rest/v1/entries?order=id.desc”,{headers:H}); entries=await r.json(); if(!Array.isArray(entries))entries=[]; } catch(e){entries=[];}
+renderGallery();
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-```
+function renderGallery() {
+document.getElementById(‘count’).textContent = entries.length+’ 本 記録済み 🎉’;
+const el = document.getElementById(‘view-list’);
+if(entries.length===0){el.innerHTML=’<div class="empty"><div style="font-size:60px">🥛</div><p style="font-size:16px;color:#3a9fd4;font-weight:700;margin-top:12px">まだ記録がないよ！</p><small style="font-size:13px;color:#90cde8">旅先で飲んだ牛乳を追加しよう ☁️</small></div>’;return;}
+let h=’<div class="grid">’;
+entries.forEach(e=>{
+const img=e.image?`<img src="${e.image}" alt="">`:’<div class="no-img">🥛</div>’;
+h+=`<div class="card" onclick="showDetail(${e.id})">${img}<div class="card-label"><div class="cn">${e.name}</div><div class="cs">${'⭐'.repeat(e.rating||0)}</div></div></div>`;
+});
+h+=’</div>’; el.innerHTML=h;
+}
 
-  </script>
+function showView(v) {
+[‘list’,‘add’,‘detail’].forEach(x=>{
+document.getElementById(‘view-’+x).style.display=x===v?‘block’:‘none’;
+const b=document.getElementById(‘btn-’+x); if(b){b.className=x===v?‘active’:‘inactive’;}
+});
+if(v===‘add’)resetForm();
+}
+
+function resetForm() {
+formImage=null; formRating=3;
+[‘f-name’,‘f-brand’,‘f-location’,‘f-notes’].forEach(id=>document.getElementById(id).value=’’);
+document.getElementById(‘f-date’).value=new Date().toISOString().split(‘T’)[0];
+document.getElementById(‘f-type’).value=‘普通牛乳’;
+document.getElementById(‘f-richness’).value=3;
+document.getElementById(‘f-flavor’).value=3;
+document.getElementById(‘photo-upload’).innerHTML=’<div class="photo-placeholder"><div style="font-size:30px">📷</div><small style="font-size:11px;margin-top:6px;font-weight:600;display:block">タップして写真を選ぶ</small></div>’;
+document.getElementById(‘remove-photo’).style.display=‘none’;
+document.getElementById(‘save-btn’).style.background=‘linear-gradient(135deg,#3a9fd4,#5bb8e8)’;
+document.getElementById(‘save-btn’).textContent=‘🥛 記録する！’;
+document.getElementById(‘save-btn’).disabled=false;
+updateRichness(); updateFlavor(‘f-flavor’,‘f-flavor-thumb’,‘f-flavor-lbl’); renderStars();
+}
+
+function handlePhoto(input) {
+const file=input.files[0]; if(!file)return;
+const reader=new FileReader();
+reader.onload=ev=>{formImage=ev.target.result;document.getElementById(‘photo-upload’).innerHTML=`<img src="${formImage}">`;document.getElementById(‘remove-photo’).style.display=‘block’;};
+reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+formImage=null;
+document.getElementById(‘photo-upload’).innerHTML=’<div class="photo-placeholder"><div style="font-size:30px">📷</div><small style="font-size:11px;margin-top:6px;font-weight:600;display:block">タップして写真を選ぶ</small></div>’;
+document.getElementById(‘remove-photo’).style.display=‘none’;
+document.getElementById(‘file-input’).value=’’;
+}
+
+function setRating(n){formRating=n;renderStars();}
+function renderStars(){
+const el=document.getElementById(‘stars-form’);
+el.innerHTML=[1,2,3,4,5].map(n=>`<span onclick="setRating(${n})" style="filter:${n<=formRating?'none':'grayscale(1) opacity(0.25)'}">⭐</span>`).join(’’);
+}
+
+function updateRichness(){document.getElementById(‘richness-display’).textContent=‘🥛’.repeat(parseInt(document.getElementById(‘f-richness’).value));}
+
+function updateFlavor(inputId,thumbId,lblId){
+const v=parseInt(document.getElementById(inputId).value);
+const pct=((v-1)/4)*88+6;
+const t=document.getElementById(thumbId);
+t.style.left=pct+’%’; t.textContent=v<=2?‘🧀’:v>=4?‘🧈’:‘🥛’;
+document.getElementById(lblId).textContent=FL[v];
+}
+
+async function handleAdd(){
+const name=document.getElementById(‘f-name’).value.trim();
+const location=document.getElementById(‘f-location’).value.trim();
+if(!name||!location){alert(‘名前と場所は必須です！’);return;}
+const btn=document.getElementById(‘save-btn’);
+btn.textContent=‘保存中…’; btn.disabled=true;
+const data={name,location,brand:document.getElementById(‘f-brand’).value.trim(),date:document.getElementById(‘f-date’).value,type:document.getElementById(‘f-type’).value,rating:formRating,richness:parseInt(document.getElementById(‘f-richness’).value),flavor:parseInt(document.getElementById(‘f-flavor’).value),notes:document.getElementById(‘f-notes’).value.trim(),image:formImage};
+try{
+const r=await fetch(SB_URL+”/rest/v1/entries”,{method:“POST”,headers:{…H,“Prefer”:“return=representation”},body:JSON.stringify(data)});
+const result=await r.json();
+if(Array.isArray(result)&&result[0])entries.unshift(result[0]); else await loadEntries();
+}catch(e){await loadEntries();}
+btn.style.background=‘linear-gradient(135deg,#86efac,#34d399)’; btn.textContent=‘✅ 保存したよ！’;
+document.getElementById(‘count’).textContent=entries.length+’ 本 記録済み 🎉’;
+setTimeout(()=>{showView(‘list’);renderGallery();},1000);
+}
+
+function showDetail(id){
+const e=entries.find(x=>x.id===id); if(!e)return;
+currentId=id;
+document.getElementById(‘detail-img’).innerHTML=e.image?`<img src="${e.image}" alt="">`:’<div style="font-size:60px">🥛</div>’;
+document.getElementById(‘detail-name’).textContent=e.name;
+const b=document.getElementById(‘detail-brand’); b.textContent=e.brand||’’; b.style.display=e.brand?‘block’:‘none’;
+document.getElementById(‘detail-stars’).innerHTML=[1,2,3,4,5].map(n=>`<span style="font-size:26px;filter:${n<=(e.rating||0)?'none':'grayscale(1) opacity(0.25)'}">⭐</span>`).join(’’);
+document.getElementById(‘detail-grid’).innerHTML=[[‘📍’,‘場所’,e.location],[‘📅’,‘日付’,e.date],[‘🏷️’,‘種類’,e.type],[‘💧’,‘コク’,‘🥛’.repeat(e.richness||0)]].map(([em,lb,v])=>`<div class="info-item"><div style="font-size:15px;margin-bottom:2px">${em}</div><div style="font-size:10px;color:#90cde8;font-weight:700;margin-bottom:2px">${lb}</div><div style="font-size:12px;color:#2c5f7a;font-weight:700">${v}</div></div>`).join(’’);
+document.getElementById(‘d-flavor’).value=e.flavor||3;
+updateFlavor(‘d-flavor’,‘d-flavor-thumb’,‘d-flavor-lbl’);
+const nb=document.getElementById(‘detail-notes-box’);
+if(e.notes){nb.style.display=‘block’;document.getElementById(‘detail-notes’).textContent=e.notes;}else{nb.style.display=‘none’;}
+document.getElementById(‘delete-btn’).onclick=()=>handleDelete(id);
+showView(‘detail’);
+}
+
+async function handleDelete(id){
+if(!confirm(‘この記録を削除しますか？’))return;
+await fetch(SB_URL+”/rest/v1/entries?id=eq.”+id,{method:“DELETE”,headers:H});
+entries=entries.filter(e=>e.id!==id);
+document.getElementById(‘count’).textContent=entries.length+’ 本 記録済み 🎉’;
+showView(‘list’); renderGallery();
+}
+
+showView(‘list’); renderStars(); updateFlavor(‘f-flavor’,‘f-flavor-thumb’,‘f-flavor-lbl’); loadEntries();
+</script>
+
 </body>
 </html>
